@@ -28,7 +28,8 @@ Handles some automatic volume adjustment (like enabling the headset and muting o
 
 ## wifi-picker
 
-Useful in a topology with a WLAN and multiple access points, will pick the AP with the strongest signal and connect.
+Useful in a topology with a WLAN and multiple access points, will pick the AP with the strongest signal and connect. Must be run as root because iwlist
+won't return a list of SSIDs otherwise.
 
 ```sh
 wifi-picker.sh <interface> <SSID>
@@ -37,5 +38,5 @@ wifi-picker.sh <interface> <SSID>
 ie
 
 ```sh
-wifi-picker.sh wlan0 home_wifi
+sudo wifi-picker.sh wlan0 home_wifi
 ```
