@@ -1,13 +1,16 @@
 #!/bin/bash
 wlan=$1
 SSID=$2
-wifipassword=$3
-iwlist $WLAN scan > /tmp/wlanlist
-out=`tac /tmp/wlanlist | grep "$SSID\|Quality\|Address" | sed -n 's/.*ESSID\:\"\(.*\)\"\|.*Quality=\([0-9][0-9]\).*\|.*Address\: \(.*\)/\1\2\3/p'`
+
+TMP=/tmp/wlanlist
+
+iwlist $wlan scan > $TMP || exit 2
+out=`tac $TMP | grep "$SSID\|Quality\|Address" | sed -n 's/.*ESSID\:\"\(.*\)\"\|.*Quality=\([0-9][0-9]\).*\|.*Address\: \(.*\)/\1\2\3/p'`
+
 SHOW_NEXT_LINE=-1
 BSSID=""
 QUALITY=0
-rm -f /tmp/wlanlist2
+rm -f $TMP 2> /dev/null
 for LINE in ${out} ; do
 	case $SHOW_NEXT_LINE in
 	2)
@@ -15,7 +18,7 @@ for LINE in ${out} ; do
 	;;
 	1)
 		BSSID=$LINE
-		echo $BSSID $QUALITY >> /tmp/wlanlist2
+		echo $BSSID $QUALITY >> $TMP
 	;;
 	esac
  	if [[ "$SSID" == "$LINE" ]]
@@ -23,14 +26,19 @@ for LINE in ${out} ; do
 		SHOW_NEXT_LINE=3
 	fi
 	let SHOW_NEXT_LINE-=1
- 
 done
 
-bestAP_power=`cat /tmp/wlanlist2 | sort -k2 | tail -n 1 | cut -c19-20`
-bestAP_MAC=`cat /tmp/wlanlist2 | sort -k2 | tail -n 1 | cut -c1-17`
+if [ ! -f $TMP ];
+then
+	echo Missing $TMP . Is $wlan down or is $SSID not in range? 
+	exit 1
+fi
+
+bestAP_power=`cat $TMP | sort -n --key=2 | tail -n 1 | cut -d " " -f 1`
+bestAP_MAC=`cat $TMP | sort -n --key=2 | tail -n 1 | cut -d " " -f 1`
 
 
-AP_MAC=`iwconfig | grep "Access Point" | sed -n 's/.*Access Point\: \(.*\)\s/\1/p' | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}'`
+AP_MAC=`iwconfig $wlan | grep "Access Point" | sed -n 's/.*Access Point\: \(.*\)\s/\1/p' | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}'`
 echo The best AP is !$bestAP_MAC!
 echo Currently connected to AP !$AP_MAC!
 
@@ -39,6 +47,8 @@ if [ "$AP_MAC" = "$bestAP_MAC" ]; then
 else
 	echo Reconnecting to AP $bestAP_MAC
 	sudo ifconfig $wlan down
-	sudo iwconfig $wlan essid $SSID ap "$bestAP_MAC" key "$wifipassword"
+	sudo iwconfig $wlan essid $SSID ap "$bestAP_MAC"
 	sudo dhclient $wlan
 fi
+
+rm $TMP
