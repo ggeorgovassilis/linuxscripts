@@ -40,3 +40,5 @@ ie
 ```sh
 sudo wifi-picker.sh wlan0 home_wifi
 ```
+
+Note: You might need to restart some applications or even services after running the script, e.g. Firefox won't be able to connect to Google or Facebook.
