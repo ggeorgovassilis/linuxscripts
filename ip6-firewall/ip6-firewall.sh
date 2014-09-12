@@ -39,10 +39,6 @@ $IPT6 -A INPUT -p tcp --destination-port 22 -j ACCEPT
 
 #redirect ports
 
-#old, failed experiments
-#$IPT6 -t mangle -A PREROUTING -p tcp --dport 80 -j TPROXY --on-port 6081
-#ip6tables -t nat -A PREROUTING -i sixxs -p tcp --dport 80 -j DNAT --to-destination [2a01:4f8:d12:11c6::2]:6081
-
 $IPT6 -t nat -A PREROUTING -p tcp --dport 80 -m cpu --cpu 0 -j REDIRECT --to-port 6081 
 
 
