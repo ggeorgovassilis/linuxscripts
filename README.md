@@ -42,3 +42,7 @@ sudo wifi-picker.sh wlan0 home_wifi
 ```
 
 Note: You might need to restart some applications or even services after running the script, e.g. Firefox won't be able to connect to Google or Facebook.
+
+## ip6-firewall
+
+Example script that shows how to harden an ip6 enabled web server. Closes down everything other than port 22 (ssh), 80 (http), 6081 (varnish) and ICMP and redirects traffic from port 80 to 6081. 
