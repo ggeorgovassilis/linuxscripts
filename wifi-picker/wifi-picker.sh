@@ -48,7 +48,9 @@ else
 	echo Reconnecting to AP $bestAP_MAC
 	sudo ifconfig $wlan down
 	sudo iwconfig $wlan essid $SSID ap "$bestAP_MAC"
-	sudo dhclient $wlan
+	(sudo dhclient $wlan)&
+	(sudo dhclient -6 $wlan)&
+	
 fi
 
 rm $TMP
