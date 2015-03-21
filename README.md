@@ -45,4 +45,9 @@ Note: You might need to restart some applications or even services after running
 
 ## ip6-firewall
 
-Example script that shows how to harden an ip6 enabled web server. Closes down everything other than port 22 (ssh), 80 (http), 6081 (varnish) and ICMP and redirects traffic from port 80 to 6081. 
+Example script that shows how to harden an ip6 enabled web server. Closes down everything other than port 22 (ssh), 80 (http), 6081 (varnish) and ICMP and redirects traffic from port 80 to 6081.
+
+## some extra keyboard mappings
+
+Example script from [here](http://larsmichelsen.com/open-source/german-umlauts-on-us-keyboard-in-x-ubuntu-10-04/) that adds some special characters
+for European languages to an US keyboard mapping. 

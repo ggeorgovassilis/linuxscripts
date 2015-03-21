@@ -121,7 +121,8 @@ enable_laptop_mode_tools () {
 
 hdd_pm () {
 #Make HDD park heads
-	hdparm -B128 /dev/sda
+# I've got an SSD, so...
+	hdparm -B 1 /dev/sda
 }
 
 silence_audio () {
