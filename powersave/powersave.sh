@@ -215,7 +215,7 @@ esac
 case $COMMAND in
 extra)
 
-/home/george/bin/powersave on
+"$0" on
 # stop irqbalance
 	switch_service irqbalance
 
