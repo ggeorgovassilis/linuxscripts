@@ -35,7 +35,7 @@ won't return a list of SSIDs otherwise.
 wifi-picker.sh <interface> <SSID>
 ```
 
-ie
+e.g.
 
 ```sh
 sudo wifi-picker.sh wlan0 home_wifi
@@ -51,3 +51,12 @@ Example script that shows how to harden an ip6 enabled web server. Closes down e
 
 Example script from [here](http://larsmichelsen.com/open-source/german-umlauts-on-us-keyboard-in-x-ubuntu-10-04/) that adds some special characters
 for European languages to an US keyboard mapping. 
+
+## switch the tp-link hs100 wlan smart plug on/off
+
+Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. You'll need the IP address and port (was 9999 in my tests) and the on/off command, e.g.:
+
+
+```sh
+switch-plug.sh 192.168.1.20 9999 on
+```
