@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off
@@ -18,9 +18,12 @@ payload_on="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=="
 payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeowAAAC3Q8oH4i/+a
 99XvlLbFoNSL+Zzwkei3xLDRpcDi2KOB5Jbku9i307aUrp7jnuM="
 
+payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
+
+
 usage() {
  echo Usage:
- echo $0 ip port on/off
+ echo $0 ip port on/off/query
  exit 1
 }
 
@@ -45,7 +48,7 @@ sendtoplug() {
   ip="$1"
   port="$2"
   payload="$3"
-  echo -n "$payload" | base64 -d | nc $ip $port > /dev/null || echo couldn''t connect to $ip:$port, nc failed with exit code $?
+  echo -n "$payload" | base64 -d | nc -v $ip $port  || echo couldn''t connect to $ip:$port, nc failed with exit code $?
 }
 
 
@@ -55,10 +58,22 @@ sendtoplug() {
 checkargs
 case "$cmd" in
   on)
-  sendtoplug $ip $port "$payload_on"
+  sendtoplug $ip $port "$payload_on" > /dev/null
   ;;
   off)
-  sendtoplug $ip $port "$payload_off"
+  sendtoplug $ip $port "$payload_off" > /dev/null
+  ;;
+  query)
+  output=`sendtoplug $ip $port "$payload_query" | base64`
+  if [[ $output == AAACJ* ]] ;
+  then
+     echo OFF
+  fi
+  if [[ $output == AAACK* ]] ;
+  then
+     echo ON
+  fi
+
   ;;
   *)
   usage

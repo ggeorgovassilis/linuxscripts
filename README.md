@@ -60,3 +60,9 @@ Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. Y
 ```sh
 switch-plug.sh 192.168.1.20 9999 on
 ```
+
+To query the plug's status:
+
+```sh
+switch-plug.sh 192.168.1.20 9999 query
+```
