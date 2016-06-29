@@ -3,6 +3,7 @@
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off
 #  Tested with firmware 1.0.8
+#  Credits to Thomas Baust for the query/status command
 #
 ip=$1
 port=$2
@@ -13,17 +14,19 @@ check_binaries() {
   command -v base64 >/dev/null 2>&1 || { echo >&2 "The base64 programme for decoding base64 encoded strings isn't installed"; exit 2; }
 }
 
+# base64 encoded data to send to the plug to switch it on 
 payload_on="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=="
 
-payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeowAAAC3Q8oH4i/+a
-99XvlLbFoNSL+Zzwkei3xLDRpcDi2KOB5Jbku9i307aUrp7jnuM="
+# base64 encoded data to send to the plug to switch it off
+payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=="
 
+# base64 encoded data to send to the plug to query it
 payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
 
 
 usage() {
  echo Usage:
- echo $0 ip port on/off/query
+ echo $0 ip port on/off/check/status
  exit 1
 }
 
@@ -51,6 +54,30 @@ sendtoplug() {
   echo -n "$payload" | base64 -d | nc -v $ip $port  || echo couldn''t connect to $ip:$port, nc failed with exit code $?
 }
 
+check(){
+  output=`sendtoplug $ip $port "$payload_query" | base64`
+  if [[ $output == AAACJ* ]] ;
+  then
+     echo OFF
+  fi
+  if [[ $output == AAACK* ]] ;
+  then
+     echo ON
+  fi
+}
+
+status(){
+  code=171
+  offset=4
+  input_num=`sendtoplug $ip $port "$payload_query" | od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
+  IFS=' ' read -r -a array <<< "$input_num"
+  for element in "${array[@]}"
+  do
+    output=$(( $element ^ $code ))
+    printf "\x$(printf %x $output)"
+    code=$element
+  done
+}
 
 ##
 #  Main programme
@@ -63,17 +90,11 @@ case "$cmd" in
   off)
   sendtoplug $ip $port "$payload_off" > /dev/null
   ;;
-  query)
-  output=`sendtoplug $ip $port "$payload_query" | base64`
-  if [[ $output == AAACJ* ]] ;
-  then
-     echo OFF
-  fi
-  if [[ $output == AAACK* ]] ;
-  then
-     echo ON
-  fi
-
+  check)
+  check
+  ;;	
+  status)
+  status
   ;;
   *)
   usage
