@@ -1,17 +1,23 @@
 #!/bin/bash
 
 ##
-#  Switch the TP-LINK HS100 wlan smart plug on and off
+#  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
 #  Tested with firmware 1.0.8
-#  Credits to Thomas Baust for the query/status command
 #
+#  Credits to Thomas Baust for the query/status/emeter commands
+#
+#  Author George Georgovassilis, https://github.com/ggeorgovassilis/linuxscripts
+
 ip=$1
 port=$2
 cmd=$3
 
 check_binaries() {
-  command -v nc >/dev/null 2>&1 || { echo >&2 "The nc programme for sending data over the network isn't installed"; exit 2; }
-  command -v base64 >/dev/null 2>&1 || { echo >&2 "The base64 programme for decoding base64 encoded strings isn't installed"; exit 2; }
+  command -v nc >/dev/null 2>&1 || { echo >&2 "The nc programme for sending data over the network isn't in the path, communication with the plug will fail"; exit 2; }
+  command -v base64 >/dev/null 2>&1 || { echo >&2 "The base64 programme for decoding base64 encoded strings isn't in the path, decoding of payloads will fail"; exit 2; }
+  command -v od >/dev/null 2>&1 || { echo >&2 "The od programme for converting binary data to numbers isn't in the path, the status and emeter commands will fail";}
+  command -v read >/dev/null 2>&1 || { echo >&2 "The read programme for splitting text into tokens isn't in the path, the status and emeter commands will fail";}
+  command -v printf >/dev/null 2>&1 || { echo >&2 "The printf programme for converting numbers into binary isn't in the path, the status and emeter commands will fail";}
 }
 
 # base64 encoded data to send to the plug to switch it on 
@@ -26,7 +32,6 @@ payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
 # base64 encoded data to query emeter - hs100 doesn't seem to support this in hardware, but the API seems to be there...
 payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
 
-
 usage() {
  echo Usage:
  echo $0 ip port on/off/check/status/emeter
@@ -37,8 +42,7 @@ checkarg() {
  name="$1"
  value="$2"
 
- if [ -z "$value" ]
-  then
+ if [ -z "$value" ]; then
     echo "missing argument $name"
     usage
  fi
@@ -86,6 +90,7 @@ status(){
 ##
 #  Main programme
 ##
+check_binaries
 checkargs
 case "$cmd" in
   on)

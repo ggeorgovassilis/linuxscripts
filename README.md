@@ -58,25 +58,25 @@ Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. Y
 
 Switch plug on:
 ```sh
-switch-plug.sh 192.168.1.20 9999 on
+hs100.sh 192.168.1.20 9999 on
 ```
 
 Switch plug off:
 ```sh
-switch-plug.sh 192.168.1.20 9999 on
+hs100.sh 192.168.1.20 9999 on
 ```
 
 Check if plug is on or off:
 ```sh
-switch-plug.sh 192.168.1.20 9999 check
+hs100.sh 192.168.1.20 9999 check
 ```
 
 Print plug system status:
 ```sh
-switch-plug.sh 192.168.1.20 9999 status
+hs100.sh 192.168.1.20 9999 status
 ```
 
-Print power consumption (not supported with my hs100):
+Print power consumption (not supported with my hs100 so not tested):
 ```sh
-switch-plug.sh 192.168.1.20 9999 emeter
+hs100.sh 192.168.1.20 9999 emeter
 ```
