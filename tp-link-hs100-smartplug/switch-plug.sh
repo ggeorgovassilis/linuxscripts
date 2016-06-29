@@ -23,10 +23,13 @@ payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=="
 # base64 encoded data to send to the plug to query it
 payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
 
+# base64 encoded data to query emeter - hs100 doesn't seem to support this in hardware, but the API seems to be there...
+payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
+
 
 usage() {
  echo Usage:
- echo $0 ip port on/off/check/status
+ echo $0 ip port on/off/check/status/emeter
  exit 1
 }
 
@@ -67,9 +70,10 @@ check(){
 }
 
 status(){
+  payload="$1"
   code=171
   offset=4
-  input_num=`sendtoplug $ip $port "$payload_query" | od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
+  input_num=`sendtoplug $ip $port "$payload" | od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
   IFS=' ' read -r -a array <<< "$input_num"
   for element in "${array[@]}"
   do
@@ -94,7 +98,10 @@ case "$cmd" in
   check
   ;;	
   status)
-  status
+  status "$payload_query"
+  ;;
+  emeter)
+  status "$payload_emeter"
   ;;
   *)
   usage

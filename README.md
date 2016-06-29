@@ -54,7 +54,7 @@ for European languages to an US keyboard mapping.
 
 ## switch the tp-link hs100 wlan smart plug on/off
 
-Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. You'll need the IP address and port (was 9999 in my tests) and the on/off/check/status option, e.g.:
+Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. You'll need the IP address and port (was 9999 in my tests) and a command, e.g.:
 
 Switch plug on:
 ```sh
@@ -74,4 +74,9 @@ switch-plug.sh 192.168.1.20 9999 check
 Print plug system status:
 ```sh
 switch-plug.sh 192.168.1.20 9999 status
+```
+
+Print power consumption (not supported with my hs100):
+```sh
+switch-plug.sh 192.168.1.20 9999 emeter
 ```
