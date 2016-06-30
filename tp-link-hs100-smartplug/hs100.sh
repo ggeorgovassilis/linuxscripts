@@ -12,7 +12,15 @@ ip=$1
 port=$2
 cmd=$3
 
-check_binaries() {
+# base64 encoded commands to send to the plug
+payload_on="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=="
+payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=="
+payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
+payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
+
+# tools
+
+check_dependencies() {
   command -v nc >/dev/null 2>&1 || { echo >&2 "The nc programme for sending data over the network isn't in the path, communication with the plug will fail"; exit 2; }
   command -v base64 >/dev/null 2>&1 || { echo >&2 "The base64 programme for decoding base64 encoded strings isn't in the path, decoding of payloads will fail"; exit 2; }
   command -v od >/dev/null 2>&1 || { echo >&2 "The od programme for converting binary data to numbers isn't in the path, the status and emeter commands will fail";}
@@ -20,97 +28,107 @@ check_binaries() {
   command -v printf >/dev/null 2>&1 || { echo >&2 "The printf programme for converting numbers into binary isn't in the path, the status and emeter commands will fail";}
 }
 
-# base64 encoded data to send to the plug to switch it on 
-payload_on="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=="
-
-# base64 encoded data to send to the plug to switch it off
-payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=="
-
-# base64 encoded data to send to the plug to query it
-payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
-
-# base64 encoded data to query emeter - hs100 doesn't seem to support this in hardware, but the API seems to be there...
-payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
-
-usage() {
- echo Usage:
- echo $0 ip port on/off/check/status/emeter
- exit 1
+show_usage() {
+  echo Usage:
+  echo $0 ip port on/off/check/status/emeter
+  exit 1
 }
 
-checkarg() {
- name="$1"
- value="$2"
 
- if [ -z "$value" ]; then
-    echo "missing argument $name"
-    usage
- fi
+check_arguments() {
+   check_arg() {
+    name="$1"
+    value="$2"
+    if [ -z "$value" ]; then
+       echo "missing argument $name"
+       show_usage
+    fi
+   }
+   check_arg "ip" $ip
+   check_arg "port" $port
+   check_arg "command" $cmd
 }
 
-checkargs() {
-  checkarg "ip" $ip
-  checkarg "port" $port
-  checkarg "command" $cmd
+send_to_plug() {
+   ip="$1"
+   port="$2"
+   payload="$3"
+   echo -n "$payload" | base64 -d | nc -v $ip $port || echo couldn''t connect to $ip:$port, nc failed with exit code $?
 }
 
-sendtoplug() {
-  ip="$1"
-  port="$2"
-  payload="$3"
-  echo -n "$payload" | base64 -d | nc -v $ip $port  || echo couldn''t connect to $ip:$port, nc failed with exit code $?
+decode(){
+   code=171
+   offset=4
+   input_num=`od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
+   IFS=' ' read -r -a array <<< "$input_num"
+   args_for_printf=""
+   for element in "${array[@]}"
+   do
+     output=$(( $element ^ $code ))
+     args_for_printf="$args_for_printf\x$(printf %x $output)"
+     code=$element
+   done
+     printf "$args_for_printf"
 }
 
-check(){
-  output=`sendtoplug $ip $port "$payload_query" | base64`
-  if [[ $output == AAACJ* ]] ;
-  then
+query_plug(){
+   payload=$1
+   send_to_plug $ip $port "$payload" | decode
+}
+
+# plug commands
+
+cmd_print_plug_relay_state(){
+   output=`send_to_plug $ip $port "$payload_query" | base64`
+   if [[ $output == AAACJ* ]]; then
      echo OFF
-  fi
-  if [[ $output == AAACK* ]] ;
-  then
+   elif [[ $output == AAACK* ]]; then
      echo ON
-  fi
+   else
+     echo Couldn''t understand plug response $output
+   fi
 }
 
-status(){
-  payload="$1"
-  code=171
-  offset=4
-  input_num=`sendtoplug $ip $port "$payload" | od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
-  IFS=' ' read -r -a array <<< "$input_num"
-  for element in "${array[@]}"
-  do
-    output=$(( $element ^ $code ))
-    printf "\x$(printf %x $output)"
-    code=$element
-  done
+cmd_print_plug_status(){
+     query_plug "$payload_query"
+}
+
+cmd_print_plug_consumption(){
+     query_plug "$payload_emeter"
+}
+
+cmd_switch_on(){
+     send_to_plug $ip $port $payload_on > /dev/null
+}
+
+cmd_switch_off(){
+     send_to_plug $ip $port $payload_off > /dev/null
 }
 
 ##
 #  Main programme
 ##
-check_binaries
-checkargs
+
+check_dependencies
+check_arguments
+
 case "$cmd" in
   on)
-  sendtoplug $ip $port "$payload_on" > /dev/null
-  ;;
+     cmd_switch_on
+     ;;
   off)
-  sendtoplug $ip $port "$payload_off" > /dev/null
-  ;;
+     cmd_switch_off
+     ;;
   check)
-  check
-  ;;	
+     cmd_print_plug_relay_state
+     ;;	
   status)
-  status "$payload_query"
-  ;;
+     cmd_print_plug_status
+     ;;
   emeter)
-  status "$payload_emeter"
-  ;;
+     cmd_print_plug_consumption
+     ;;
   *)
-  usage
-  ;;
+     show_usage
+     ;;
 esac
-exit 0
-
