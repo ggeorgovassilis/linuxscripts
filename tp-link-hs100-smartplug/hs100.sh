@@ -12,10 +12,18 @@ ip=$1
 port=$2
 cmd=$3
 
-# base64 encoded commands to send to the plug
+# encoded (the reverse of decode) commands to send to the plug
+
+# encoded {"system":{"set_relay_state":{"state":1}}}
 payload_on="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu36Lfog=="
+
+# encoded {"system":{"set_relay_state":{"state":0}}}
 payload_off="AAAAKtDygfiL/5r31e+UtsWg1Iv5nPCR6LfEsNGlwOLYo4HyhueT9tTu3qPeow=="
+
+# encoded { "system":{ "get_sysinfo":null } }
 payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
+
+# the encoded request { "emeter":{ "get_realtime":null } }
 payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
 
 # tools
@@ -29,8 +37,8 @@ check_dependencies() {
 }
 
 show_usage() {
-  echo Usage:
-  echo $0 ip port on/off/check/status/emeter
+  echo Usage: $0 IP PORT COMMAND
+  echo where COMMAND is one of on/off/check/status/emeter
   exit 1
 }
 
@@ -108,6 +116,7 @@ cmd_switch_off(){
 ##
 #  Main programme
 ##
+
 
 check_dependencies
 check_arguments
