@@ -52,9 +52,9 @@ Example script that shows how to harden an ip6 enabled web server. Closes down e
 Example script from [here](http://larsmichelsen.com/open-source/german-umlauts-on-us-keyboard-in-x-ubuntu-10-04/) that adds some special characters
 for European languages to an US keyboard mapping. 
 
-## switch the tp-link hs100 wlan smart plug on/off
+## control the tp-link hs100 and hs110 wlan smart plug
 
-Script to connect over TCP/IP to an hs100 smart plug and switch it on and off. You'll need the IP address and port (was 9999 in my tests) and a command, e.g.:
+Script to connect over TCP/IP to an hs100/hs110 smart plug, switch it on and off and query status information. You'll need the IP address and port (was 9999 in my tests) and a command, e.g.:
 
 Switch plug on:
 ```sh
