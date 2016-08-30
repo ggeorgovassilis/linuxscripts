@@ -1,82 +1,49 @@
-linuxscripts
+tp-link Wi-Fi Smart Plug HS100
 ============
 
-Script collection for linux
+## About
 
+The [tp-link Wi-Fi Smart Plug model HS100](http://www.tp-link.us/products/details/HS100.html) is an embedded Linux computer with a Wifi chip, a 110/220 V AC relay with a 15 A current limit, and a US-style grounded electrical socket. You pair with it by establishing an ad-hoc network between the plug and a smartphone (also called Wifi direct). After giving your router's SSID and access information, the plug connects to it and you can control the plug with the app provided by tp-link, called Kasa. One downside of using Kasa is that it's really not much more than a wall-switch in an app, though it does have pretty rich timer features which are nice. But you can't do things like turn the light on or off in response to events on the internet. Tp-link does provide a network control mode, but you have to pass control of your plug over to them, which isn't particularly great if you endeavor to remain the master of your own domain, haha only serious.
 
-## powersave
-
-Enables some powersaving on the Asus N56VB and Ubuntu 12.04. Should work on other computers and Linuxes as well. In order to enable power saving run the script with an argument of either light, on or extra like this:
-
-```sh
-powersave.sh light
-```
-
-The script contains self-explanatory functions grouped under a big CASE that enable various power saving features. Depending on your needs, you can re-arrange these functions to different cases. For example, I work mostly in a wireless setup, so I moved the "disable_ethernet" function to the "light" case. Also, when on the road, I don't do heavy processing, so I moved "make_cpus_sleep" to the "on" case - however my applications need a lot of CPU at work, so I'm not running the "make_cpus_sleep" function in the "light" setting. 
-
-## brightness
-
-Allows for finer brightness control for the Asus N56VB and Ubuntu 12.04. You probably need to adjust the "B" variable in the script.
-
-```sh
-brightness.sh down
-```
-
-## usb-headset
-
-Handles some automatic volume adjustment (like enabling the headset and muting other equipment). You probably will have to adjust the device names.
-
-## wifi-picker
-
-Useful in a topology with a WLAN and multiple access points, will pick the AP with the strongest signal and connect. Must be run as root because iwlist
-won't return a list of SSIDs otherwise.
-
-```sh
-wifi-picker.sh <interface> <SSID>
-```
-
-e.g.
-
-```sh
-sudo wifi-picker.sh wlan0 home_wifi
-```
-
-Note: You might need to restart some applications or even services after running the script, e.g. Firefox won't be able to connect to Google or Facebook.
-
-## ip6-firewall
-
-Example script that shows how to harden an ip6 enabled web server. Closes down everything other than port 22 (ssh), 80 (http), 6081 (varnish) and ICMP and redirects traffic from port 80 to 6081.
-
-## some extra keyboard mappings
-
-Example script from [here](http://larsmichelsen.com/open-source/german-umlauts-on-us-keyboard-in-x-ubuntu-10-04/) that adds some special characters
-for European languages to an US keyboard mapping. 
+The script below was graciously provided by @ggeorgovassilis in his [linux scripts repo](https://github.com/ggeorgovassilis/linuxscripts), with help from Thomas Baust. You can read a great descriptoin of the reverse engineering process and the development of the script [at George's blog here.](https://georgovassilis.blogspot.com/2016/05/controlling-tp-link-hs100-wi-fi-smart.html)
 
 ## control the tp-link hs100 and hs110 wlan smart plug
 
 Script to connect over TCP/IP to an hs100/hs110 smart plug, switch it on and off and query status information. You'll need the IP address and port (was 9999 in my tests) and a command, e.g.:
 
+Print what IP your HS100 has:
+```sh
+hs100.sh discover
+```
+
+Discover IP, and save it for later:
+* if you use sudo, then an entry is written into `/etc/hosts` for the HS100, if it is found
+* if you don't do this, you must add an `-i 192.168.1.20` arguments to all other `hs100.sh` commands, e.g. `hs100.sh -i 192.168.1.20 on`
+```
+sudo hs100.sh discover
+```
+
 Switch plug on:
 ```sh
-hs100.sh 192.168.1.20 9999 on
+hs100.sh on
 ```
 
 Switch plug off:
 ```sh
-hs100.sh 192.168.1.20 9999 on
+hs100.sh on
 ```
 
 Check if plug is on or off:
 ```sh
-hs100.sh 192.168.1.20 9999 check
+hs100.sh check
 ```
 
 Print plug system status:
 ```sh
-hs100.sh 192.168.1.20 9999 status
+hs100.sh status
 ```
 
 Print power consumption (not supported with my hs100 so not tested):
 ```sh
-hs100.sh 192.168.1.20 9999 emeter
+hs100.sh emeter
 ```
