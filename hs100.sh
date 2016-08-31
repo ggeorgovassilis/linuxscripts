@@ -46,6 +46,29 @@ quiet(){
    $@ >/dev/null 2>&1
 }
 
+mac_from_ip()
+{
+    # if you've contacted an IP recently, the arp cache has juicy info
+    local ip=$1
+    mac=$(arp -a \
+            | grep "($ip)" \
+            | egrep -o '(([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})' )
+    [ -z "$mac" ] && { echo 2>&1 "arp didn't find a MAC for $ip!"; return 1; }
+    echo "mac $mac"
+}
+
+unique_hostname()
+{
+    # given a prefix and a MAC for a host, construct a unique name for the host
+    local prefix=$1;    [ -n $prefix ] || return 1
+    local mac=$2;       [ -n $mac ] || return 1
+
+    # use the first 7 characters of the shasum as unique ID
+    hash=$(echo $mac | shasum)
+    hs100host=hs100${hash:0:7}
+    echo $hs100host
+}
+
 check_dependency()
 {
     dep=$1
@@ -126,36 +149,29 @@ cmd_discover(){
         return 0
     fi
 
+    # remove existing hs100* hosts entries
+    sed -i '/hs100/d' /etc/hosts
+
     if [[ ${#hs100ip} = 1 ]]
     then
         hs100host=hs100
-        # remove previous host entry, and add new one
-        sed -i '/'$hs100host'/d' /etc/hosts
         echo ${hs100ip}'\t'${hs100host} >> /etc/hosts
         echo $hs100host
     else
         for ip in ${hs100ip[@]}
         do
-        # ok there are multiple HS100 plugs on the network
-        # we'll append a shasum hash of the MAC address to make hs100host unique
+            # ok there are multiple HS100 plugs on the network
+            # we'll append a shasum hash of the MAC address to make hs100host unique
 
-        # since we just hit it with nmap, it should be in the arp cache
-        mac=$(arp -a \
-                | grep "($hs100ip)" \
-                | egrep -o '(([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})' )
-        [ -z "$mac" ] && error "arp didn't find a MAC!"
-        echo "mac $mac"
+            # since we just hit it with nmap, it should be in the arp cache
+            mac=`mac_from_ip $hs100ip`
 
-        # use the first 7 characters of the shasum as unique ID
-        hash=$(echo $mac | shasum)
-        hs100host=hs100${hash:0:7}
-        echo $hs100host
 
-        # remove previous host entry, and add new one
-        sed -i '/'$hs100host'/d' /etc/hosts
-        echo ${hs100ip}'\t'${hs100host} >> /etc/hosts
-        echo $hs100host
+            hs100host=`unique_hostname hs100 $mac`
 
+            # add an entry for this hs100 plug
+            echo ${hs100ip}'\t'${hs100host} >> /etc/hosts
+            echo $hs100host
         done
     fi
 
