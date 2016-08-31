@@ -88,8 +88,8 @@ check_dependencies() {
 }
 
 usage() {
-   echo Usage: $0 IP PORT COMMAND
-   echo where COMMAND is one of on/off/check/status/emeter
+   echo "Usage: $0 [-i IP] [-p PORT] COMMAND"
+   echo "where COMMAND is one of: ${commands[@]}"
    exit 1
 }
 
@@ -107,6 +107,15 @@ check_arguments() {
    check_arg "command" $cmd
 }
 
+# Check for a single string in a list of space-separated strings.
+# e.g. has "foo" "foo bar baz" is true, but has "f" "foo bar baz" is not.
+# from https://chromium.googlesource.com/chromiumos/platform/crosutils/+/master/common.sh
+has() 
+{ [[ " ${*:2} " == *" $1 "* ]]; }
+
+check_command()
+{ has "$1" "$commands"; }
+   
 send_to_plug() {
    ip="$1"
    port="$2"
@@ -205,6 +214,8 @@ cmd_switch_off(){
    send_to_plug $ip $port $payload_off > /dev/null
 }
 
+commands=( on off check status emeter discover )
+
 # run the Main progamme, if we are not being sourced
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
@@ -230,6 +241,7 @@ cmd=$1
 
 check_dependencies
 check_arguments
+check_command $cmd
 
 case "$cmd" in
   discover) cmd_discover;;
