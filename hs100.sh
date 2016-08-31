@@ -46,22 +46,22 @@ quiet(){
    $@ >/dev/null 2>&1
 }
 
+check_dependency()
+{
+    dep=$1
+    message=$2
+    quiet command -v "$dep" || error "$message"
+}
+
 check_dependencies() {
-   quiet command -v nc \
-      || error "The nc programme for sending data over the network isn't" \
-               "in the path, communication with the plug will fail"
-   quiet command -v base64 \
-      || error "The base64 programme for decoding base64 encoded strings isn't" \
-               "in the path, decoding of payloads will fail"
-   quiet command -v od \
-      || error "The od programme for converting binary data to numbers isn't" \
-               "in the path, the status and emeter commands will fail"
-   quiet command -v read \
-      || error "The read programme for splitting text into tokens isn't" \
-               "in the path, the status and emeter commands will fail"
-   quiet command -v printf \
-      || error "The printf programme for converting numbers into binary isn't"\
-               "in the path, the status and emeter commands will fail"
+    check_dependency nc     "The nc programme for sending data over the network isn't" \
+                            "in the path, communication with the plug will fail"
+    check_dependency base64 "The base64 programme for decoding base64 encoded strings isn't" \
+                            "in the path, decoding of payloads will fail"
+    check_dependency od     "The od programme for converting binary data to numbers isn't" \
+                            "in the path, the status and emeter commands will fail"
+    check_dependency shasum "The shasum programme for hashing strings isn't"\
+                            "in the path, the sudo discover command will fail"
 }
 
 usage() {
