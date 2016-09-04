@@ -38,7 +38,7 @@ check_dependencies() {
 
 show_usage() {
   echo Usage: $0 IP PORT COMMAND
-  echo where COMMAND is one of on/off/check/status/emeter
+  echo where COMMAND is one of on/off/check/status/emeter/toggle
   exit 1
 }
 
