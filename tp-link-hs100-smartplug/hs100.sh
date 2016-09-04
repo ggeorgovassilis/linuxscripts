@@ -113,6 +113,17 @@ cmd_switch_off(){
      send_to_plug $ip $port $payload_off > /dev/null
 }
 
+cmd_switch_toggle() {
+   output=`cmd_print_plug_relay_state`
+   if [[ $output == OFF ]]; then
+     cmd_switch_on
+   elif [[ $output == ON ]]; then
+     cmd_switch_off
+   else
+     echo $output
+   fi
+}
+
 ##
 #  Main programme
 ##
@@ -127,6 +138,9 @@ case "$cmd" in
      ;;
   off)
      cmd_switch_off
+     ;;
+  toggle)
+     cmd_switch_toggle
      ;;
   check)
      cmd_print_plug_relay_state
