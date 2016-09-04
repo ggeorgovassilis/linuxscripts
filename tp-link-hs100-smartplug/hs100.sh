@@ -87,10 +87,10 @@ query_plug(){
 # plug commands
 
 cmd_print_plug_relay_state(){
-   output=`send_to_plug $ip $port "$payload_query" | base64`
-   if [[ $output == AAACJ* ]]; then
+   output=`send_to_plug $ip $port "$payload_query" | decode | egrep -o 'relay_state":[0,1]' | egrep -o '[0,1]'`
+   if [[ $output -eq 0 ]]; then
      echo OFF
-   elif [[ $output == AAACK* ]]; then
+   elif [[ $output -eq 1 ]]; then
      echo ON
    else
      echo Couldn''t understand plug response $output
@@ -113,6 +113,17 @@ cmd_switch_off(){
      send_to_plug $ip $port $payload_off > /dev/null
 }
 
+cmd_switch_toggle() {
+   output=`cmd_print_plug_relay_state`
+   if [[ $output == OFF ]]; then
+     cmd_switch_on
+   elif [[ $output == ON ]]; then
+     cmd_switch_off
+   else
+     echo $output
+   fi
+}
+
 ##
 #  Main programme
 ##
@@ -127,6 +138,9 @@ case "$cmd" in
      ;;
   off)
      cmd_switch_off
+     ;;
+  toggle)
+     cmd_switch_toggle
      ;;
   check)
      cmd_print_plug_relay_state
