@@ -145,7 +145,7 @@ query_plug(){
 
 # plug commands
 cmd_discover(){
-    myip=`~/cantrips/myip.sh`
+    myip=`./myip.sh`
     subnet=${myip%%.[0-9]}.0-255
     hs100ip=$(nmap -p ${port} --open ${subnet} \
                 | grep 'Nmap scan report for' \
@@ -214,7 +214,7 @@ cmd_switch_off(){
    send_to_plug $ip $port $payload_off > /dev/null
 }
 
-commands=( on off check status emeter discover )
+commands=" on off check status emeter discover "
 
 # run the Main progamme, if we are not being sourced
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
