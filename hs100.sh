@@ -25,9 +25,17 @@ payload_query="AAAAI9Dw0qHYq9+61/XPtJS20bTAn+yV5o/hh+jK8J7rh+vLtpbr"
 payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
 
 # BSD base64 decode on osx has different options
+# BSD od (octal dump) on osx has different options
+od_offset=4
 case $OSTYPE in
-   darwin*)  BASE64DEC="-D";;
-   *)        BASE64DEC="-d";;
+   darwin*)
+      BASE64DEC="-D"
+      ODOPTS="-j $od_offset -A n -t u1"
+      ;;
+   linux*)
+      BASE64DEC="-d"
+      ODOPTS="--skip-bytes=$od_offset --address-radix=n -t u1 --width=9999"
+      ;;
 esac
 
 # netcat options
@@ -132,8 +140,7 @@ send_to_plug() {
 
 decode(){
    code=171
-   offset=4
-   input_num=`od --skip-bytes=$offset --address-radix=n -t u1 --width=9999`
+   input_num=`od $ODOPTS`
    IFS=' ' read -r -a array <<< "$input_num"
    args_for_printf=""
    for element in "${array[@]}"
