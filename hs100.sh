@@ -114,12 +114,12 @@ check_arguments() {
 # Check for a single string in a list of space-separated strings.
 # e.g. has "foo" "foo bar baz" is true, but has "f" "foo bar baz" is not.
 # from https://chromium.googlesource.com/chromiumos/platform/crosutils/+/master/common.sh
-has() 
+has()
 { [[ " ${*:2} " == *" $1 "* ]]; }
 
 check_command()
 { has "$1" "$commands"; }
-   
+
 send_to_plug() {
    ip="$1"
    port="$2"
@@ -229,7 +229,7 @@ set -- $args
 
 for i #in $@
 do
-    case "$i" in 
+    case "$i" in
     -q) opt_quiet=yes; shift;;
     -v) set -o xtrace; shift;;
     -i) ip=$2; shift; shift;;
