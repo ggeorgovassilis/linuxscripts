@@ -77,14 +77,18 @@ check_dependency()
 }
 
 check_dependencies() {
-    check_dependency nc     "The nc programme for sending data over the network isn't" \
-                            "in the path, communication with the plug will fail"
-    check_dependency base64 "The base64 programme for decoding base64 encoded strings isn't" \
-                            "in the path, decoding of payloads will fail"
-    check_dependency od     "The od programme for converting binary data to numbers isn't" \
-                            "in the path, the status and emeter commands will fail"
-    check_dependency shasum "The shasum programme for hashing strings isn't"\
-                            "in the path, the sudo discover command will fail"
+    check_dependency nc \
+       "The nc programme for sending data over the network isn't" \
+       "in the path, communication with the plug will fail"
+    check_dependency base64 \
+       "The base64 programme for decoding base64 encoded strings isn't" \
+       "info the path, decoding of payloads will fail"
+    check_dependency od \
+        "The od programme for converting binary data to numbers isn't" \
+        "in the path, the status and emeter commands will fail"
+    check_dependency shasum \
+        "The shasum programme for hashing strings isn't"\
+        "in the path, the sudo discover command will fail"
 }
 
 usage() {
