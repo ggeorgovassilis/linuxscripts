@@ -124,7 +124,10 @@ send_to_plug() {
    ip="$1"
    port="$2"
    payload="$3"
-   echo -n "$payload" | base64 ${BASE64DEC} | nc $NCOPTS $ip $port || echo couldn''t connect to $ip:$port, nc failed with exit code $?
+   if ! echo -n "$payload" | base64 ${BASE64DEC} | nc $NCOPTS $ip $port
+   then
+      echo couldn''t connect to $ip:$port, nc failed with exit code $?
+   fi
 }
 
 decode(){
