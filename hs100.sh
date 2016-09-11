@@ -175,10 +175,10 @@ cmd_discover(){
     # remove existing hs100* hosts entries
     sed -i bak /hs100/d /etc/hosts
 
-    if [[ ${#hs100ip} = 1 ]]
+    if [[ ${#hs100ip[@]} = 1 ]]
     then
         hs100host=hs100
-        echo ${hs100ip}'\t'${hs100host} >> /etc/hosts
+        printf "${hs100ip}\t${hs100host}\n" >> /etc/hosts
         echo $hs100host
     else
         for ip in ${hs100ip[@]}
@@ -202,13 +202,13 @@ cmd_discover(){
 }
 
 cmd_print_plug_relay_state(){
-   output=`send_to_plug $ip $port "$payload_query" | base64`
-   if [[ $output == AAACJ* ]]; then
-      echo OFF
-   elif [[ $output == AAACK* ]]; then
-      echo ON
+   output=`send_to_plug $ip $port "$payload_query" | decode | egrep -o 'relay_state":[0,1]' | egrep -o '[0,1]'`
+   if [[ $output -eq 0 ]]; then
+     echo OFF
+   elif [[ $output -eq 1 ]]; then
+     echo ON
    else
-      echo Couldn''t understand plug response $output
+     echo Couldn''t understand plug response $output
    fi
 }
 
