@@ -40,7 +40,8 @@ esac
 
 # netcat options
 timeout=2
-NCOPTS='-v' # verbose
+NCOPTS=""
+#NCOPTS+='-v' # verbose
 NCOPTS+=" -G $timeout"
 
 # tools
