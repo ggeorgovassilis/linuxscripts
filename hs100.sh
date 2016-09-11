@@ -82,8 +82,8 @@ host_entry()
 {
     host=$1
     ip=$2
-    printf "${hs100ip}\t${hs100host}\n" >> /etc/hosts
-    echo plug $host has ip $hs100ip
+    printf "${ip}\t${host}\n" >> /etc/hosts
+    echo plug $host has ip $ip
 }
 
 check_dependency()
