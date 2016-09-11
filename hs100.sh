@@ -103,8 +103,14 @@ check_dependencies() {
     check_dependency od \
         "The od programme for converting binary data to numbers isn't" \
         "in the path, the status and emeter commands will fail"
+    check_dependency nmap \
+        "The nmap programme for mapping networks isn't"\
+        "in the path, the discover command will fail"
     check_dependency shasum \
         "The shasum programme for hashing strings isn't"\
+        "in the path, the sudo discover command will fail"
+    check_dependency arp \
+        "The arp programme to access Address Resolution Protocol cache isn't"\
         "in the path, the sudo discover command will fail"
 }
 
