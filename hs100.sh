@@ -170,9 +170,10 @@ query_plug(){
 cmd_discover(){
     myip=`./myip.sh`
     subnet=${myip%%.[0-9]}.0-255
-    hs100ip=$(nmap -p ${port} --open ${subnet} \
+    hs100ip=( $(nmap -p ${port} --open ${subnet} \
                 | grep 'Nmap scan report for' \
                 | egrep -o '(([0-9]{1,3}\.){3}[0-9]{1,3})' ) \
+            ) \
         || error "Could not find any hs100 plugs"
 
     # if we can't write this to /etc/hosts, echo what we found and quit
