@@ -63,7 +63,7 @@ mac_from_ip()
             | grep "($ip)" \
             | egrep -o '(([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2})' )
     [ -z "$mac" ] && { echo 2>&1 "arp didn't find a MAC for $ip!"; return 1; }
-    echo "mac $mac"
+    echo $mac
 }
 
 unique_hostname()
@@ -76,6 +76,14 @@ unique_hostname()
     hash=$(echo $mac | shasum)
     hs100host=hs100${hash:0:7}
     echo $hs100host
+}
+
+host_entry()
+{
+    host=$1
+    ip=$2
+    printf "${hs100ip}\t${hs100host}\n" >> /etc/hosts
+    echo plug $host has ip $hs100ip
 }
 
 check_dependency()
@@ -166,10 +174,11 @@ cmd_discover(){
                 | grep 'Nmap scan report for' \
                 | egrep -o '(([0-9]{1,3}\.){3}[0-9]{1,3})' ) \
         || error "Could not find any hs100 plugs"
-    # if we can, add this to /etc/hosts
+
+    # if we can't write this to /etc/hosts, echo what we found and quit
     if ! [ -w /etc/hosts ]
     then
-        echo $hs100ip
+        echo HS100 plugs found: $hs100ip
         return 0
     fi
 
@@ -178,27 +187,18 @@ cmd_discover(){
 
     if [[ ${#hs100ip[@]} = 1 ]]
     then
-        hs100host=hs100
-        printf "${hs100ip}\t${hs100host}\n" >> /etc/hosts
-        echo $hs100host
-    else
-        for ip in ${hs100ip[@]}
-        do
-            # ok there are multiple HS100 plugs on the network
-            # we'll append a shasum hash of the MAC address to make hs100host unique
-
-            # since we just hit it with nmap, it should be in the arp cache
-            mac=`mac_from_ip $hs100ip`
-
-
-            hs100host=`unique_hostname hs100 $mac`
-
-            # add an entry for this hs100 plug
-            echo ${hs100ip}'\t'${hs100host} >> /etc/hosts
-            echo $hs100host
-        done
+        host_entry hs100 $hs100ip
+        return 0
     fi
 
+    # multiple HS100 plugs on the network, hash MAC address for unique hostname
+    for ip in ${hs100ip[@]}
+    do
+        # since we just hit it with nmap, it should be in the arp cache
+        mac=`mac_from_ip $hs100ip`
+        hs100host=`unique_hostname hs100 $mac`
+        host_entry $hs100host $hs100ip
+    done
     return 0
 }
 
