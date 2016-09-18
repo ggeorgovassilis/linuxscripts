@@ -18,7 +18,8 @@ then
     ifconfig \
         | grep '^\s*inet[^6]' \
         | grep -v '127.0.0.1' \
-        | awk '{ print $2 }'
+        | egrep -o '(([0-9]{1,3}\.){3}[0-9]{1,3})'\
+        | head -n 1
 else
     echo 2>&1 "Must have ipconfig or ifconfig available to get IP address"
     exit 1
