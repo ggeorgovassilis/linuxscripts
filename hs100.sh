@@ -88,8 +88,8 @@ host_entry()
 
 check_dependency()
 {
-    dep=$1
-    message=$2
+    dep=$1; shift
+    message=$@
     quiet command -v "$dep" || error "$message"
 }
 
