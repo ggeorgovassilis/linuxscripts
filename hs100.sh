@@ -3,10 +3,6 @@
 set -o errexit
 
 here=$(me=`readlink -f $0`; cd `dirname $me`; echo $PWD)
-echo ${here}
-
-cat ${here}/myip.sh
-exit 0
 
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
@@ -180,8 +176,9 @@ query_plug(){
 
 # plug commands
 cmd_discover(){
-    myip=`./myip.sh`
-    subnet=${myip%%.[0-9]}.0-255
+    myip=`${here}/myip.sh`
+    subnet=$(echo $myip | egrep -o '([0-9]{1,3}\.){3}')
+    subnet=${subnet}0-255
     hs100ip=( $(nmap -p ${port} --open ${subnet} \
                 | grep 'Nmap scan report for' \
                 | egrep -o '(([0-9]{1,3}\.){3}[0-9]{1,3})' ) \
