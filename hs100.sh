@@ -2,6 +2,12 @@
 
 set -o errexit
 
+here=$(me=`readlink -f $0`; cd `dirname $me`; echo $PWD)
+echo ${here}
+
+cat ${here}/myip.sh
+exit 0
+
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
 #  Tested with firmware 1.0.8
@@ -88,8 +94,8 @@ host_entry()
 
 check_dependency()
 {
-    dep=$1
-    message=$2
+    dep=$1; shift
+    message=$@
     quiet command -v "$dep" || error "$message"
 }
 
