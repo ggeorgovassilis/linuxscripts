@@ -176,6 +176,7 @@ query_plug(){
 cmd_discover(){
     myip=`./myip.sh`
     subnet=${myip%%.[0-9]}.0-255
+    declare -a hs100ip
     hs100ip=( $(nmap -p ${port} --open ${subnet} \
                 | grep 'Nmap scan report for' \
                 | egrep -o '(([0-9]{1,3}\.){3}[0-9]{1,3})' ) \
@@ -185,7 +186,7 @@ cmd_discover(){
     # if we can't write this to /etc/hosts, echo what we found and quit
     if ! [ -w /etc/hosts ]
     then
-        echo HS100 plugs found: $hs100ip
+        echo HS100 plugs found: ${hs100ip[@]}
         return 0
     fi
 
@@ -202,9 +203,9 @@ cmd_discover(){
     for ip in ${hs100ip[@]}
     do
         # since we just hit it with nmap, it should be in the arp cache
-        mac=`mac_from_ip $hs100ip`
+        mac=`mac_from_ip $ip`
         hs100host=`unique_hostname hs100 $mac`
-        host_entry $hs100host $hs100ip
+        host_entry $hs100host $ip
     done
     return 0
 }
