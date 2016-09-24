@@ -2,7 +2,7 @@
 
 set -o errexit
 
-here=$(me=`readlink -f $0`; cd `dirname $me`; echo $PWD)
+here=$(me=`readlink -f ${BASH_SOURCE[0]}`; cd `dirname $me`; echo $PWD)
 
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
