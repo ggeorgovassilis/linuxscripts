@@ -194,7 +194,7 @@ cmd_discover(){
     fi
 
     # remove existing hs100* hosts entries
-    sed -i bak /hs100/d /etc/hosts
+    sed -i.bak /hs100/d /etc/hosts
 
     if [[ ${#hs100ip[@]} = 1 ]]
     then
