@@ -29,22 +29,23 @@ payload_emeter="AAAAJNDw0rfav8uu3P7Ev5+92r/LlOaD4o76k/6buYPtmPSYuMXlmA=="
 # BSD base64 decode on osx has different options
 # BSD od (octal dump) on osx has different options
 od_offset=4
+# BSD netcat on osx has different options
+nc_timeout=2
+NCOPTS=""
+#NCOPTS+='-v' # verbose
 case $OSTYPE in
    darwin*)
       BASE64DEC="-D"
       ODOPTS="-j $od_offset -A n -t u1"
+      NCOPTS+=" -G $nc_timeout"
       ;;
    linux*)
       BASE64DEC="-d"
       ODOPTS="--skip-bytes=$od_offset --address-radix=n -t u1 --width=9999"
+      NCOPTS+=" -w $nc_timeout"
       ;;
 esac
 
-# netcat options
-timeout=2
-NCOPTS=""
-#NCOPTS+='-v' # verbose
-NCOPTS+=" -G $timeout"
 
 # tools
 
