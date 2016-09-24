@@ -89,6 +89,11 @@ host_entry()
     echo plug $host has ip $ip
 }
 
+my_plugs()
+{
+    cat /etc/hosts | grep hs100 | awk '{ print $2 }'
+}
+
 check_dependency()
 {
     dep=$1; shift
@@ -132,7 +137,7 @@ check_arguments() {
          usage
       fi
    }
-   check_arg "ip" $ip
+   check_arg "ip" $plugs
    check_arg "port" $port
    check_arg "command" $cmd
 }
@@ -170,9 +175,24 @@ decode(){
    printf "$args_for_printf"
 }
 
+pretty_json()
+{
+    # read from stdin
+    if quiet command -v python
+    then
+         python -m json.tool
+    else
+         cat
+         echo
+    fi
+}
+
 query_plug(){
    payload=$1
-   send_to_plug $ip $port "$payload" | decode
+   for ip in ${plugs[@]}
+   do
+        send_to_plug $ip $port "$payload" | decode | pretty_json
+   done
 }
 
 # plug commands
@@ -215,14 +235,21 @@ cmd_discover(){
 }
 
 cmd_print_plug_relay_state(){
-   output=`send_to_plug $ip $port "$payload_query" | decode | egrep -o 'relay_state":[0,1]' | egrep -o '[0,1]'`
-   if [[ $output -eq 0 ]]; then
-     echo OFF
-   elif [[ $output -eq 1 ]]; then
-     echo ON
-   else
-     echo Couldn''t understand plug response $output
-   fi
+   for ip in ${plugs[@]}
+   do
+       printf "$ip\t"
+       output=`send_to_plug $ip $port "$payload_query" \
+               | decode \
+               | egrep -o 'relay_state":[0,1]' \
+               | egrep -o '[0,1]'`
+       if (( output = 0 )); then
+         echo OFF
+       elif (( output = 1 )); then
+         echo ON
+       else
+         echo Couldn''t understand plug response $output
+       fi
+   done
 }
 
 cmd_print_plug_status(){
@@ -234,14 +261,20 @@ cmd_print_plug_consumption(){
 }
 
 cmd_switch_on(){
-   send_to_plug $ip $port $payload_on > /dev/null
+   for ip in ${plugs[@]}
+   do
+       send_to_plug $ip $port $payload_on > /dev/null
+   done
 }
 
 cmd_switch_off(){
-   send_to_plug $ip $port $payload_off > /dev/null
+   for ip in ${plugs[@]}
+   do
+       send_to_plug $ip $port $payload_off > /dev/null
+   done
 }
 
-commands=" on off check status emeter discover "
+commands=" on off check status emeter discover list "
 
 # run the Main progamme, if we are not being sourced
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
@@ -250,19 +283,21 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 args=`getopt qvi:p: $*` || { usage; exit 1; }
 set -- $args
 
+declare -a plugs;
+
 for i #in $@
 do
     case "$i" in
     -q) opt_quiet=yes; shift;;
     -v) set -o xtrace; shift;;
-    -i) ip=$2; shift; shift;;
+    -i) plugs=$2; shift; shift;;
     -p) port=$2; shift; shift;;
     --) shift; break;;
     #*)  error "Getopt broke! Found $i"
     esac
 done
 
-: ${ip=hs100}
+: ${plugs=`my_plugs`}
 : ${port=9999}
 cmd=$1
 
@@ -272,6 +307,7 @@ check_command $cmd
 
 case "$cmd" in
   discover) cmd_discover;;
+  list)     plugs=`my_plugs`; for p in ${plugs[@]}; do echo $p; done;;
   on)       cmd_switch_on;;
   off)      cmd_switch_off;;
   check)    cmd_print_plug_relay_state;;
