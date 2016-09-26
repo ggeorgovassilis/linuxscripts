@@ -1,0 +1,9 @@
+[Unit]
+Description=HS100 Smart Plug by Tp-Link (instance %I)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hs100 -i %i check
+User=philip
+Group=systemd-journal
+

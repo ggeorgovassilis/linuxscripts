@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodic checking of %I status
+
+[Timer]
+OnUnitActiveSec=2min
+
+[Install]
+WantedBy=hs100@%i.service
+
