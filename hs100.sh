@@ -242,9 +242,9 @@ cmd_print_plug_relay_state(){
                | decode \
                | egrep -o 'relay_state":[0,1]' \
                | egrep -o '[0,1]'`
-       if (( output = 0 )); then
+       if (( output == 0 )); then
          echo OFF
-       elif (( output = 1 )); then
+       elif (( output == 1 )); then
          echo ON
        else
          echo Couldn''t understand plug response $output
