@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ##
-#  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
-#  Tested with firmware 1.0.8
+#  Controls TP-LINK HS100,HS110, HS200 wlan smart plugs
+#  Tested with HS100 firmware 1.0.8
 #
 #  Credits to Thomas Baust for the query/status/emeter commands
 #
