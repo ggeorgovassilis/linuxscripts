@@ -63,7 +63,7 @@ hs100.sh 192.168.1.20 9999 on
 
 Switch plug off:
 ```sh
-hs100.sh 192.168.1.20 9999 on
+hs100.sh 192.168.1.20 9999 off
 ```
 
 Check if plug is on or off:
