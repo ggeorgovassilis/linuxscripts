@@ -2,6 +2,8 @@
 
 set -o errexit
 
+here=$(cd $(dirname $BASH_SOURCE[0]); echo $PWD)
+
 ##
 #  Switch the TP-LINK HS100 wlan smart plug on and off, query for status
 #  Tested with firmware 1.0.8
@@ -195,7 +197,7 @@ query_plug(){
 
 # plug commands
 cmd_discover(){
-    myip=`./myip.sh`
+    myip="`${here}/myip.sh`"
     subnet=$(echo $myip | egrep -o '([0-9]{1,3}\.){3}')
     subnet=${subnet}0-255
     declare -a hs100ip
