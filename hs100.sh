@@ -184,6 +184,9 @@ pretty_json()
 
 query_plug(){
    payload=$1
+   check_dependency od \
+       "The od programme for converting binary data to numbers isn't" \
+       "in the path, the status and emeter commands will fail"
    check_arg "ip" $plugs
    check_arg "port" $port
    for ip in ${plugs[@]}
@@ -195,6 +198,9 @@ query_plug(){
 # plug commands
 cmd_discover(){
     check_arg "port" $port
+    check_dependency nmap \
+        "The nmap programme for mapping networks isn't"\
+        "in the path, the discover command will fail"
     myip="`${here}/myip.sh`"
     subnet=$(echo $myip | egrep -o '([0-9]{1,3}\.){3}')
     subnet=${subnet}0-255
@@ -211,6 +217,13 @@ cmd_discover(){
         echo HS100 plugs found: ${hs100ip[@]}
         return 0
     fi
+
+    check_dependency shasum \
+        "The shasum programme for hashing strings isn't"\
+        "in the path, the sudo discover command will fail"
+    check_dependency arp \
+        "The arp programme to access Address Resolution Protocol cache isn't"\
+        "in the path, the sudo discover command will fail"
 
     # remove existing hs100* hosts entries
     sed -i.bak /hs100/d /etc/hosts
@@ -305,7 +318,14 @@ done
 : ${port=9999}
 cmd=$1
 
-check_dependencies
+#check_dependencies
+
+check_dependency nc \
+   "The nc programme for sending data over the network isn't" \
+   "in the path, communication with the plug will fail"
+check_dependency base64 \
+   "The base64 programme for decoding base64 encoded strings isn't" \
+   "info the path, decoding of payloads will fail"
 
 check_arg "command" $cmd
 check_command $cmd
