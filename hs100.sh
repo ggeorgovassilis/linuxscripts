@@ -128,18 +128,13 @@ usage() {
    exit 1
 }
 
-check_arguments() {
-   check_arg() {
-      name="$1"
-      value="$2"
-      if [ -z "$value" ]; then
-         echo "missing argument $name"
-         usage
-      fi
-   }
-   check_arg "ip" $plugs
-   check_arg "port" $port
-   check_arg "command" $cmd
+check_arg() {
+   name="$1"
+   value="$2"
+   if [ -z "$value" ]; then
+      echo "missing argument $name"
+      usage
+   fi
 }
 
 # Check for a single string in a list of space-separated strings.
@@ -189,6 +184,8 @@ pretty_json()
 
 query_plug(){
    payload=$1
+   check_arg "ip" $plugs
+   check_arg "port" $port
    for ip in ${plugs[@]}
    do
         send_to_plug $ip $port "$payload" | decode | pretty_json
@@ -197,6 +194,7 @@ query_plug(){
 
 # plug commands
 cmd_discover(){
+    check_arg "port" $port
     myip="`${here}/myip.sh`"
     subnet=$(echo $myip | egrep -o '([0-9]{1,3}\.){3}')
     subnet=${subnet}0-255
@@ -235,6 +233,8 @@ cmd_discover(){
 }
 
 cmd_print_plug_relay_state(){
+   check_arg "ip" $plugs
+   check_arg "port" $port
    for ip in ${plugs[@]}
    do
        printf "$ip\t"
@@ -261,13 +261,17 @@ cmd_print_plug_consumption(){
 }
 
 cmd_switch_on(){
+   check_arg "ip" $plugs
+   check_arg "port" $port
    for ip in ${plugs[@]}
    do
-       send_to_plug $ip $port $payload_on > /dev/null
+      send_to_plug $ip $port $payload_on > /dev/null
    done
 }
 
 cmd_switch_off(){
+   check_arg "ip" $plugs
+   check_arg "port" $port
    for ip in ${plugs[@]}
    do
        send_to_plug $ip $port $payload_off > /dev/null
@@ -302,7 +306,8 @@ done
 cmd=$1
 
 check_dependencies
-check_arguments
+
+check_arg "command" $cmd
 check_command $cmd
 
 case "$cmd" in
