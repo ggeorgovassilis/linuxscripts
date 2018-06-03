@@ -2,6 +2,8 @@
 
 set -o errexit
 
+(( "$DEBUG" )) && set -o xtrace
+
 here=$(cd $(dirname $BASH_SOURCE[0]); echo $PWD)
 
 ##
