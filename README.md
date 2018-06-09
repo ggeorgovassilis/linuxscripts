@@ -80,3 +80,14 @@ Print power consumption (not supported with my hs100 so not tested):
 ```sh
 hs100.sh 192.168.1.20 9999 emeter
 ```
+
+## tools for proxying a nordvpn socks5 proxy
+
+Kind of esoteric, special need for one of my setups, but many it helps out someone with a similar need. I use, among others, nordvpn. They keep changing proxy names which makes long-running, persistent connections to their proxies impossible. Fortunately they expose an API over which available proxies can be queried, so my setup consists of an haproxy which forwards TCP traffic to their proxy and a script which queries the API and updates the haproxy configuration.
+
+```sh
+update-proxy.sh
+``` 
+
+Snoop around the nordvpn-proxy directory for other tools.
+
