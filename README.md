@@ -91,3 +91,12 @@ update-proxy.sh
 
 Snoop around the nordvpn-proxy directory for other tools.
 
+## checksum-directory
+Compute the checksum of a directory and contents. Useful to make sure a location hasn't been corrupted. Must be invoked from directory to check.
+```sh
+cd /path/to/check
+/path/to/script/compute-checksum.sh
+```
+A
+```
+compute-checksum.sh
