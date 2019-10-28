@@ -52,5 +52,5 @@ backend nordvpn
     balance roundrobin
     timeout connect 10s
     timeout server 1m   
-    server proxy de497.nordvpn.com:1080
+    server proxy PLACEHOLDER:1080
 

@@ -1,7 +1,7 @@
-#!/bin/bash
-proxy=`sh ./find-proxy.sh`
-
-sed -i '/nordvpn/c\        server nordvpn '"$proxy"':1080' /etc/haproxy/haproxy.cfg
-
-echo chosing proxy $proxy
+#!/bin/sh
+cd /home/george/bin/scripts
+server=`./find-proxy.sh`
+cp haproxy.template haproxy.cfg
+sed -i "s/PLACEHOLDER/$server/g" haproxy.cfg
+cp haproxy.cfg /etc/haproxy
 service haproxy restart
