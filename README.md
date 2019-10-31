@@ -100,3 +100,19 @@ cd /path/to/check
 A
 ```
 compute-checksum.sh
+
+## qrcodes
+Script that converts a file to a series of QR codes and assembles QR codes back together into file. Doesn't work very well on big files :-(
+
+Convert "file" into a series of QR codes stored in the current directory as PNG images:
+
+```sh
+make-qr.sh sourcefile
+```
+
+Convert QR codes back into file. Takes all PNG files named part.somenumber.png in the current directory:
+```sh
+restore-qr.sh outputfile
+```
+
+
