@@ -115,4 +115,10 @@ Convert QR codes back into file. Takes all PNG files named part.somenumber.png i
 restore-qr.sh outputfile
 ```
 
+## reset-pci_device
+Reset a PCI device (like in my case, the Atheros wifi module) when the driver isn't responding and reloads the driver
+```sh
+reset-pci-device.sh
+```
+
 
