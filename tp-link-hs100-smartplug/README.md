@@ -27,3 +27,6 @@ Print power consumption (not supported with my hs100 so not tested):
 ```sh
 hs100.sh 192.168.1.20 9999 emeter
 ```
+## Running with docker
+
+`docker run -it georgovassilis/hs100:1 192.168.1.20 9999 on`
