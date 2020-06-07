@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ##
 #  Controls TP-LINK HS100,HS110, HS200 wlan smart plugs
 #  Tested with HS100 firmware 1.0.8
@@ -8,6 +7,7 @@
 #
 #  Author George Georgovassilis, https://github.com/ggeorgovassilis/linuxscripts
 
+echo args are $@ 
 ip=$1
 port=$2
 cmd=$3
