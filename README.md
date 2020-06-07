@@ -1,4 +1,4 @@
-https://hub.docker.com/repository/docker/georgovassilis/hs100linuxscripts
+linuxscripts
 ============
 
 Script collection for linux
