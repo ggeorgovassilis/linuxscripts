@@ -17,9 +17,16 @@ Prerequisites: haproxy, jq, curl
 
 ##  Using the docker image
 
-`docker run -t -i -p 1080:1080 georgovassilis/nordvpn-proxy:1`
+`docker run -t -i -p 1080:1080 -e COUNTRY_CODE=30 georgovassilis/nordvpn-proxy:latest`
 
 (please look up the latest tag on docker hub)
+
+Please look up the country codes from nordvpn's website at https://nordvpn.com/servers/tools/
+
+Some country codes (July 2020) are:
+Canada 38
+France 74
+Switzerland 209
 
 ##  Testing that it works
 

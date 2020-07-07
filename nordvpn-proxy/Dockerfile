@@ -11,4 +11,4 @@ RUN mkdir /run/haproxy/
 RUN touch /run/haproxy/admin.sock
 
 WORKDIR /nordvpn-proxy
-ENTRYPOINT ["/nordvpn-proxy/run-proxy.sh"]
+ENTRYPOINT ["/nordvpn-proxy/run-proxy.sh"]	
