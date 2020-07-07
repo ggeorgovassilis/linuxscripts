@@ -17,7 +17,7 @@ Prerequisites: haproxy, jq, curl
 
 ##  Using the docker image
 
-`docker run -t -i -p 1080:1080 -e COUNTRY_CODE=30 georgovassilis/nordvpn-proxy:latest`
+`docker run -d -t -i -p 1080:1080 --name nordvpn-proxy -e COUNTRY_CODE=30 georgovassilis/nordvpn-proxy:latest`
 
 (please look up the latest tag on docker hub)
 
