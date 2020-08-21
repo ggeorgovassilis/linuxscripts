@@ -17,6 +17,7 @@ Check if plug is on or off:
 ```sh
 hs100.sh 192.168.1.20 9999 check
 ```
+There are [reports](https://github.com/ggeorgovassilis/linuxscripts/issues/13) that this doesn't work with newer firmware
 
 Print plug system status:
 ```sh
