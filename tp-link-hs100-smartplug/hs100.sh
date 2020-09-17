@@ -87,7 +87,7 @@ query_plug(){
 # plug commands
 
 cmd_print_plug_relay_state(){
-   output=`send_to_plug $ip $port "$payload_query" | decode | egrep -o 'relay_state":[0,1]' | egrep -o '[0,1]'`
+   output=`send_to_plug $ip $port "$payload_query" | decode | egrep -oa 'relay_state":[0,1]' | egrep -o '[0,1]'`
    if [[ $output -eq 0 ]]; then
      echo OFF
    elif [[ $output -eq 1 ]]; then
