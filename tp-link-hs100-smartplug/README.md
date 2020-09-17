@@ -30,4 +30,4 @@ hs100.sh 192.168.1.20 9999 emeter
 ```
 ## Running with docker
 
-`docker run -it georgovassilis/hs100:1 192.168.1.20 9999 on`
+`docker run -it georgovassilis/hs100:latest 192.168.1.20 9999 on`
