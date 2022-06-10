@@ -14,6 +14,10 @@ powersave.sh light
 
 The script contains self-explanatory functions grouped under a big CASE that enable various power saving features. Depending on your needs, you can re-arrange these functions to different cases. For example, I work mostly in a wireless setup, so I moved the "disable_ethernet" function to the "light" case. Also, when on the road, I don't do heavy processing, so I moved "make_cpus_sleep" to the "on" case - however my applications need a lot of CPU at work, so I'm not running the "make_cpus_sleep" function in the "light" setting. 
 
+## powersave-acer-nitro5.sh
+
+Script for reducing power consumption of the Acer Nitro 5. Has four options low/medium/full/reset. The frist three do what they say, eg. "low" disables most CPU cores, pins frequency at the lowest value, reduces graphics card frequency etc. "full" undoes all power saving measures. "reset" is like "low", but first resets power saving settings - that's needed mostly after resuming from standby.
+
 ## brightness
 
 Allows for finer brightness control for the Asus N56VB and Ubuntu 12.04. You probably need to adjust the "B" variable in the script.
