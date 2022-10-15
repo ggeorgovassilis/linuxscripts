@@ -95,4 +95,7 @@ Reset a PCI device (like in my case, the Atheros wifi module) when the driver is
 reset-pci-device.sh
 ```
 
+## acer-nitro5-powerbutton-workaround.sh
+After an update in October 2022, the power button doesn't work anymore in Ubuntu 20.04. This script works around the issue by tailing syslog.
+I added it to the startup application list which runs scripts after the user logs in to the desktop.
 
