@@ -100,4 +100,9 @@ After an update in October 2022, the power button doesn't work anymore in Ubuntu
 I added it to the startup application list which runs scripts after the user logs in to the desktop.
 
 ## touchpad-volume-control.sh
-Multi-touch volume control. Allows sound volume change through touchpad gestures. Use a three-finger touch gesture to increase volume by scrolling up, decrease volume by scrolling down. 
+Multi-touch volume control. Allows sound volume change through touchpad gestures. Use a three-finger touch gesture to increase volume by scrolling up, decrease volume by scrolling down. You probably need to edit the script and set the touchpad event device in the "touchpad_device" variable. You also need to make that device readable for your user. The script needs to be run as the current user, not root. 
+
+```sh
+touchpad-volume-control.sh
+```
+
