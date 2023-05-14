@@ -99,3 +99,5 @@ reset-pci-device.sh
 After an update in October 2022, the power button doesn't work anymore in Ubuntu 20.04. This script works around the issue by tailing syslog.
 I added it to the startup application list which runs scripts after the user logs in to the desktop.
 
+## touchpad-volume-control.sh
+Multi-touch volume control. Allows sound volume change through touchpad gestures. Use a three-finger touch gesture to increase volume by scrolling up, decrease volume by scrolling down. 
