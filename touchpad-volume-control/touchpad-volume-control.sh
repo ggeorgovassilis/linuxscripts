@@ -7,21 +7,20 @@
 # Repo: https://github.com/ggeorgovassilis/linuxscripts
 
 # Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
-touchpad_device=/dev/input/event7
+declare -r touchpad_device=/dev/input/event7
 
 # Volume change per touchpad movement event
-volume_d="1%"
-gesture_active=false
-previous_y=0
+declare -r volume_d="1%"
 
-regex="\\(ABS_Y\\), value ([0-9]+)"
+# We don't need unicode support, this will default to ASCII or smth
+export LC_ALL=C
 
 function abort_if_script_already_running (){
 
-  scriptname="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
+  local scriptname="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
   for pid in $(pidof -x "$scriptname"); do
-    if [ $pid != $$ ]; then
+    if [ "$pid" != "$$" ]; then
         echo "[$(date)] : $scriptname : Process is already running with PID $pid"
         exit 1
     fi
@@ -38,15 +37,13 @@ function volume_down (){
 
 function process_line (){
 
-  line="$1"
-  if [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 1"* ]]; then
-    gesture_active=true
-  elif [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 0"* ]]; then
-    gesture_active=false
-  fi
+  local line="$1"
+  [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 1"* ]] && gesture_active=true
+  [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 0"* ]] && gesture_active=false
 
+  local regex="\\(ABS_Y\\), value ([0-9]+)"
   if [[ $gesture_active == true && "$line" =~ $regex ]]; then
-     y="${BASH_REMATCH[1]}"
+     local y="${BASH_REMATCH[1]}"
      [[ $y -lt previous_y ]] && volume_up
      [[ $y -gt previous_y ]] && volume_down
      previous_y=$y
@@ -54,7 +51,9 @@ function process_line (){
 }
 
 function read_events (){
-  
+  local gesture_active=false
+  local previous_y=0
+
 # --line-buffered disables pipe buffering. Line buffering delays lines, so the read line loop doesn't see events in a timely manner
  
   evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
