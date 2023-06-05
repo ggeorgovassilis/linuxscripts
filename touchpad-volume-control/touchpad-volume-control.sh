@@ -6,6 +6,7 @@
 # Author: George Georgovassilis 
 # Repo: https://github.com/ggeorgovassilis/linuxscripts
 
+echo Running $0
 # Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
 declare -r touchpad_device=/dev/input/event7
 
@@ -40,6 +41,10 @@ function process_line (){
   local line="$1"
   [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 1"* ]] && gesture_active=true
   [[ "$line" == *"(BTN_TOOL_TRIPLETAP), value 0"* ]] && gesture_active=false
+  
+# Two-finger gestures are used for scrolling, but sometimes they interfere with triple-finger gestures.
+# If a two-finger gesture is detected, then it's safer to assume that three-finger gesture has been cancelled.
+  [[ "$line" == *"(BTN_TOOL_DOUBLETAP)"* ]] && gesture_active=false
 
   local regex="\\(ABS_Y\\), value ([0-9]+)"
   if [[ $gesture_active == true && "$line" =~ $regex ]]; then
@@ -56,7 +61,7 @@ function read_events (){
 
 # --line-buffered disables pipe buffering. Line buffering delays lines, so the read line loop doesn't see events in a timely manner
  
-  evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
+  sudo evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_DOUBLETAP\|BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
   do process_line "$line"; \
   done < "${1:-/dev/stdin}" 
 
