@@ -13,6 +13,10 @@ declare -r touchpad_device=/dev/input/event7
 # Volume change per touchpad movement event
 declare -r volume_d="0.3%"
 
+# Loudest volume in percent
+declare -r loudest_volume="120"
+
+
 # We don't need unicode support, this will default to ASCII or smth
 export LC_ALL=C
 
@@ -29,7 +33,9 @@ function abort_if_script_already_running (){
 }
 
 function volume_up (){
-pactl set-sink-volume @DEFAULT_SINK@ "+$volume_d"
+# cap maximum volume
+current_volume=`pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+"`
+[[ $current_volume -lt $loudest_volume ]] && pactl set-sink-volume @DEFAULT_SINK@ "+$volume_d"
 }
 
 function volume_down (){
