@@ -7,8 +7,6 @@
 # Repo: https://github.com/ggeorgovassilis/linuxscripts
 
 echo Running $0
-# Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
-declare -r touchpad_device=/dev/input/event7
 
 # Volume change per touchpad movement event
 declare -r volume_up="+0.1%"
@@ -18,8 +16,13 @@ declare -r volume_down="-0.3%"
 declare -r loudest_volume="140"
 
 
+
 # We don't need unicode support, this will default to ASCII or smth
 export LC_ALL=C
+
+function find_touchpad_device () {
+  echo end | sudo evtest 2>&1 | grep -i Touchpad | cut -d ':' -f 1
+}
 
 function abort_if_script_already_running (){
 
@@ -73,6 +76,12 @@ function read_events (){
   done < "${1:-/dev/stdin}" 
 
 }
+
+
+
+# Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
+# Used to be event7, after september update it keeps changing
+declare -r touchpad_device=$(find_touchpad_device)
 
 abort_if_script_already_running
 read_events
