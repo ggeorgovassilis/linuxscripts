@@ -106,3 +106,7 @@ Multi-touch volume control. Allows sound volume change through touchpad gestures
 touchpad-volume-control.sh
 ```
 
+## clamav
+Runs clamav in a docker container. See [clamav](https://github.com/ggeorgovassilis/linuxscripts/tree/master/clamav) for details.
+
+
