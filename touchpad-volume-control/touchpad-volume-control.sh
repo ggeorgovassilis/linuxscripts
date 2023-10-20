@@ -1,12 +1,14 @@
 #!/bin/bash
 
 # Multi-touch volume control. This script requires read access to the event device. However you can't
-# run this as root, because amixer needs access to the current user's PulseAudio.
+# run this as root, because pactl needs access to the current user's PulseAudio.
 # Requires that evtest is installed https://manpages.ubuntu.com/manpages/bionic/man1/evtest.1.html 
+# Requires that pactl is installed. It should be easy to adjust the script to other volume control CLIs such as amixer 
 # Author: George Georgovassilis 
-# Repo: https://github.com/ggeorgovassilis/linuxscripts
+# Source code at: https://github.com/ggeorgovassilis/linuxscripts
+# License: Public domain
 
-echo Running $0
+echo Running "$0"
 
 # Volume change per touchpad movement event
 declare -r volume_up="+0.1%"
@@ -14,8 +16,6 @@ declare -r volume_down="-0.3%"
 
 # Loudest volume in percent
 declare -r loudest_volume="140"
-
-
 
 # We don't need unicode support, this will default to ASCII or smth
 export LC_ALL=C
@@ -74,13 +74,10 @@ function read_events (){
   sudo evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_DOUBLETAP\|BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
   do process_line "$line"; \
   done < "${1:-/dev/stdin}" 
-
 }
 
-
-
 # Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
-# Used to be event7, after september update it keeps changing
+# Used to be event7, after September update it keeps changing
 declare -r touchpad_device=$(find_touchpad_device)
 
 abort_if_script_already_running
