@@ -20,9 +20,11 @@ docker rm clamd || echo no clamd container found
 docker run \
     --name "clamd" \
     --volume "$base/signaturedb":/var/lib/clamav \
-    --volume "$dirtoscan":/scandir:ro \
+    --volume "/home/george":/scandir/home:ro \
     --mount type=bind,source=$base/sockets/,target=/tmp/ \
     -d \
     --restart always \
     --network host \
     clamav/clamav:stable
+    
+ docker logs -f clamd

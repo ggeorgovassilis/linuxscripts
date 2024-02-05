@@ -11,8 +11,7 @@
 echo Running "$0"
 
 # Volume change per touchpad movement event
-declare -r volume_up="+0.1%"
-declare -r volume_down="-0.3%"
+declare -r volume_down="-0.2%"
 
 # Loudest volume in percent
 declare -r loudest_volume="140"
@@ -37,9 +36,24 @@ function abort_if_script_already_running (){
 }
 
 function volume_up (){
-# cap maximum volume
-current_volume=`pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+"`
-[[ $current_volume -lt $loudest_volume ]] && pactl set-sink-volume @DEFAULT_SINK@ "$volume_up"
+  current_volume=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+  
+    # For volume below 20%, increase by 0.25%
+  if [ $current_volume -lt 20 ]; then
+    pactl set-sink-volume @DEFAULT_SINK@ "+0.5%"
+    # For volume between 20% and 40%, increase by 0.5%
+  elif [ $current_volume -lt 40 ]; then
+    pactl set-sink-volume @DEFAULT_SINK@ "+0.3%"
+  else
+    # For volume above 40%, increase as usual
+    pactl set-sink-volume @DEFAULT_SINK@ "+0.2%"
+  fi
+
+  # Cap maximum volume
+  current_volume=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+  if [ $current_volume -gt $loudest_volume ]; then
+    pactl set-sink-volume @DEFAULT_SINK@ $loudest_volume%
+  fi
 }
 
 function volume_down (){

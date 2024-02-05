@@ -8,7 +8,7 @@ echo running clamscan
 
 docker run -it --rm \
     --name "clamscan" \
-    --volume $dirtoscan:/scandir:ro \
+    --volume "/home/george":/scandir/home:ro \
     --mount type=bind,source=$base/sockets/,target=/tmp/ \
     --user root \
     clamav/clamav:stable_base \

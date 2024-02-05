@@ -109,4 +109,11 @@ touchpad-volume-control.sh
 ## clamav
 Runs clamav in a docker container. See [clamav](https://github.com/ggeorgovassilis/linuxscripts/tree/master/clamav) for details.
 
+## toggle-keyboard-layout.sh
+
+Alt + Shift implementation that toggles between two keyboard layouts. You need to edit the script for keyboard layouts.
+
+```sh
+toggle-keyboard-layout.sh
+```
 

@@ -1,0 +1,1 @@
+Script that lets you toggle with Alt + Shift between two keyboard layouts. This is an (incomplete) workaround for a desktop system where this feature is broken (eg. ubuntu 22.04 in February 2024). You might have to edit the script for your setting, eg. languages and the input device.
