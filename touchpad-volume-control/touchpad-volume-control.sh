@@ -3,21 +3,30 @@
 # Multi-touch volume control. This script requires read access to the event device. However you can't
 # run this as root, because pactl needs access to the current user's PulseAudio.
 # Requires that evtest is installed https://manpages.ubuntu.com/manpages/bionic/man1/evtest.1.html 
-# Requires that pactl is installed. It should be easy to adjust the script to other volume control CLIs such as amixer 
+# Requires that amixer is installed. 
 # Author: George Georgovassilis 
 # Source code at: https://github.com/ggeorgovassilis/linuxscripts
 # License: Public domain
 
 echo Running "$0"
 
-# Volume change per touchpad movement event
-declare -r volume_down="-0.2%"
-
+set -eu
 # Loudest volume in percent
-declare -r loudest_volume="140"
+declare -r loudest_volume="100"
+
+# amixer doesn't allow fractional (eg 0.1%) relative volume changes. Since there are many scroll events per second, we can simulate this with delays
+declare -r volume_up_change_interval_ms=50
+declare -r volume_down_change_interval_ms=20
 
 # We don't need unicode support, this will default to ASCII or smth
 export LC_ALL=C
+
+# Get current time in ms
+now () {
+  echo $(date +%s%3N)
+}
+
+last_volume_change_ts=$( now )
 
 function find_touchpad_device () {
   echo end | sudo evtest 2>&1 | grep -i Touchpad | cut -d ':' -f 1
@@ -35,29 +44,49 @@ function abort_if_script_already_running (){
   done
 }
 
+function has_time_elapsed (){
+  delta=$1
+  now_ts=$( now )
+  [[ $(( $now_ts - $last_volume_change_ts )) -gt $delta ]] && (last_volume_change_ts=$now_ts) && return 0
+  return 1
+}
+
+function set_volume (){
+  echo sset Master "$1"
+}
+
 function volume_up (){
-  current_volume=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+
+  has_time_elapsed $volume_up_change_interval_ms || return 0
   
+  current_volume=$(amixer sget Master | grep Left | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+
+  [[ $current_volume -eq $loudest_volume ]] && return 0
+  
+  d_volume="1%+"
     # For volume below 20%, increase by 0.25%
   if [ $current_volume -lt 20 ]; then
-    pactl set-sink-volume @DEFAULT_SINK@ "+0.5%"
+    d_volume="1%+"
     # For volume between 20% and 40%, increase by 0.5%
   elif [ $current_volume -lt 40 ]; then
-    pactl set-sink-volume @DEFAULT_SINK@ "+0.3%"
-  else
-    # For volume above 40%, increase as usual
-    pactl set-sink-volume @DEFAULT_SINK@ "+0.2%"
+    d_volume="1%+"
   fi
+  
+  set_volume "$d_volume"
 
   # Cap maximum volume
-  current_volume=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+  current_volume=$(amixer sget Master | grep Left | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
   if [ $current_volume -gt $loudest_volume ]; then
-    pactl set-sink-volume @DEFAULT_SINK@ $loudest_volume%
+     set_volume "$loudest_volume"
   fi
+
 }
 
 function volume_down (){
-pactl set-sink-volume @DEFAULT_SINK@ "$volume_down"
+  has_time_elapsed $volume_down_change_interval_ms || return 0
+  set_volume "1%-"
+
+#pactl set-sink-volume @DEFAULT_SINK@ "$volume_down"
 }
 
 function process_line (){
@@ -87,7 +116,7 @@ function read_events (){
  
   sudo evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_DOUBLETAP\|BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
   do process_line "$line"; \
-  done < "${1:-/dev/stdin}" 
+  done < "${1:-/dev/stdin}" | amixer --quiet --stdin
 }
 
 # Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
