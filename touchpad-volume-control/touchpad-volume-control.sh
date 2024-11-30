@@ -11,12 +11,10 @@
 echo Running "$0"
 
 set -eu
-# Loudest volume in percent
-declare -r loudest_volume="100"
 
 # amixer doesn't allow fractional (eg 0.1%) relative volume changes. Since there are many scroll events per second, we can simulate this with delays
 declare -r volume_up_change_interval_ms=50
-declare -r volume_down_change_interval_ms=20
+declare -r volume_down_change_interval_ms=50
 
 # We don't need unicode support, this will default to ASCII or smth
 export LC_ALL=C
@@ -51,42 +49,18 @@ function has_time_elapsed (){
   return 1
 }
 
-function set_volume (){
-  echo sset Master "$1"
-}
-
 function volume_up (){
 
   has_time_elapsed $volume_up_change_interval_ms || return 0
-  
-  current_volume=$(amixer sget Master | grep Left | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
+    
+  pactl set-sink-volume @DEFAULT_SINK@ +0.5%
 
-  [[ $current_volume -eq $loudest_volume ]] && return 0
-  
-  d_volume="1%+"
-    # For volume below 20%, increase by 0.25%
-  if [ $current_volume -lt 20 ]; then
-    d_volume="1%+"
-    # For volume between 20% and 40%, increase by 0.5%
-  elif [ $current_volume -lt 40 ]; then
-    d_volume="1%+"
-  fi
-  
-  set_volume "$d_volume"
-
-  # Cap maximum volume
-  current_volume=$(amixer sget Master | grep Left | grep -o -E "[0-9]+%" | head -1 | grep -o -E "[0-9]+")
-  if [ $current_volume -gt $loudest_volume ]; then
-     set_volume "$loudest_volume"
-  fi
 
 }
 
 function volume_down (){
   has_time_elapsed $volume_down_change_interval_ms || return 0
-  set_volume "1%-"
-
-#pactl set-sink-volume @DEFAULT_SINK@ "$volume_down"
+  pactl set-sink-volume @DEFAULT_SINK@ -1%
 }
 
 function process_line (){
@@ -116,7 +90,7 @@ function read_events (){
  
   sudo evtest "$touchpad_device" | grep --line-buffered 'BTN_TOOL_DOUBLETAP\|BTN_TOOL_TRIPLETAP\|ABS_Y' | while read line; \
   do process_line "$line"; \
-  done < "${1:-/dev/stdin}" | amixer --quiet --stdin
+  done < "${1:-/dev/stdin}"
 }
 
 # Event source device. Yours may vary. See https://wiki.ubuntu.com/DebuggingTouchpadDetection/evtest
