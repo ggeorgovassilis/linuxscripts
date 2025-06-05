@@ -67,6 +67,7 @@ Snoop around the nordvpn-proxy directory for other tools.
 
 ## checksum-directory
 Compute the checksum of a directory and contents. Useful to make sure a location hasn't been corrupted. Must be invoked from directory to check.
+
 ```sh
 cd /path/to/check
 /path/to/script/compute-checksum.sh
@@ -85,12 +86,14 @@ make-qr.sh sourcefile
 ```
 
 Convert QR codes back into file. Takes all PNG files named part.somenumber.png in the current directory:
+
 ```sh
 restore-qr.sh outputfile
 ```
 
 ## reset-pci_device
-Reset a PCI device (like in my case, the Atheros wifi module) when the driver isn't responding and reloads the driver
+Reset a PCI device (like in my case, the Atheros wifi module) when the driver isn't responding and reloads the driver.
+
 ```sh
 reset-pci-device.sh
 ```
@@ -115,5 +118,13 @@ Alt + Shift implementation that toggles between two keyboard layouts. You need t
 
 ```sh
 toggle-keyboard-layout.sh
+```
+
+## cpu-speed.sh
+
+Sets the maximum CPU frequency.
+
+```sh
+cpu-speed.sh up
 ```
 
