@@ -3,8 +3,12 @@
 # Default frequency if no valid parameter is given
 FREQUENCY="2000MHz" # Default to normal
 
+function log(){
+echo "$1" >&2
+}
+
 function get_current_frequency(){
-cpupower frequency-info | grep -oP 'frequency should be within \d+ MHz and \K([\d.]+) (GHz|MHz)' | awk '{
+cpupower frequency-info | grep -oP 'frequency should be within \d+.\d+ (GHz|MHz) and \K(\d+.\d+) (GHz|MHz)' | awk '{
     value = $1;
     unit = $2;
     if (unit == "GHz") {
@@ -17,7 +21,10 @@ cpupower frequency-info | grep -oP 'frequency should be within \d+ MHz and \K([\
 
 function up(){
 f=$(get_current_frequency)
-if [[ "$f" -lt "1001" ]]; then
+log "current F $f"
+if [[ "$f" -lt "501" ]]; then
+  f=1000
+elif [[ "$f" -lt "1001" ]]; then
   f=2000
 elif [[ "$f" -lt "2001" ]]; then
   f=3000
@@ -33,8 +40,10 @@ if [[ "$f" -gt "3999" ]]; then
   f=3000
 elif [[ "$f" -gt "2999" ]]; then
   f=2000
-else
+elif [[ "$f" -gt "1999" ]]; then
   f=1000
+else
+  f=500
 fi
 echo "$f"MHz
 }
