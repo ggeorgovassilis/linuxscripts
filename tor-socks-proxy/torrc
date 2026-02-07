@@ -1,0 +1,5 @@
+SocksPort   0.0.0.0:8080
+
+Log notice file /tmp/tor.log
+LogMessageDomains 1
+

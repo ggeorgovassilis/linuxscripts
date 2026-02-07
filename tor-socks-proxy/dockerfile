@@ -1,0 +1,22 @@
+FROM ubuntu:24.04
+
+EXPOSE 8080
+
+RUN apt -y update
+RUN DEBIAN_FRONTEND=noninteractive apt -y install apt-transport-https ca-certificates wget gnupg iproute2 net-tools
+RUN ifconfig
+
+RUN echo "deb [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org noble main" > /etc/apt/sources.list.d/tor.list
+RUN echo "deb-src [signed-by=/usr/share/keyrings/tor-archive-keyring.gpg] https://deb.torproject.org/torproject.org noble main" >> /etc/apt/sources.list.d/tor.list
+
+RUN wget -qO- https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg >/dev/null
+
+RUN apt -y update
+RUN apt -y install tor nyx deb.torproject.org-keyring obfs4proxy
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN adduser --quiet --disabled-password --gecos "" tor
+
+USER tor
+CMD /usr/bin/tor -f /etc/tor/torrc
+
