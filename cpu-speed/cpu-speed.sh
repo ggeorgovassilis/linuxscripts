@@ -29,7 +29,7 @@ elif [[ "$f" -lt "1001" ]]; then
 elif [[ "$f" -lt "2001" ]]; then
   f=3000
 else
-  f=4000
+  f=4800
 fi
 echo "$f"MHz
 }
